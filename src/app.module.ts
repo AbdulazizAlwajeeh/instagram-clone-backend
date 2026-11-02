@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import databaseConfig from './config/database.config';
+import { AuthModule } from './auth/auth.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -21,8 +22,9 @@ const ENV = process.env.NODE_ENV;
         password: dbConfig.password,
         database: dbConfig.name,
         synchronize: false,
+        autoLoadEntities: true,
       }),
-    })],
+    }), AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
