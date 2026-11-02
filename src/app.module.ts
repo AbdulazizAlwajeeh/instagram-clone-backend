@@ -5,12 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import databaseConfig from './config/database.config';
 import { AuthModule } from './auth/auth.module';
+import jwtConfig from './config/jwt.config';
 
 const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig], envFilePath: !ENV ? '.env.development' : '.env.' + ENV.trim() }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [databaseConfig, jwtConfig],
+      envFilePath: !ENV ? '.env.development' : '.env.' + ENV.trim()
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [databaseConfig.KEY],
@@ -24,7 +29,8 @@ const ENV = process.env.NODE_ENV;
         synchronize: false,
         autoLoadEntities: true,
       }),
-    }), AuthModule],
+    }),
+    AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

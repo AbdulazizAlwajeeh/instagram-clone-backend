@@ -1,48 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { Users } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    // TODO: Inject UsersRepository here
+  constructor(
+    @InjectRepository(Users)
+    private readonly userRepo: Repository<Users>,
+    private readonly jwtService: JwtService,
+  ) { }
 
   async signup(signupDto: SignupDto) {
-    const { email, password, username} = signupDto;
+    const { email, password, username } = signupDto;
 
-    // 1. Check if the user already exists in your database
-    //    If yes -> throw new ConflictException('Email already exists');
+    const userExists = await this.userRepo.findOne({ where: { email } });
+    if (userExists) { throw new ConflictException(); }
 
-    // 2. Hash the password using bcrypt
-    //    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3. Save the new user record to your database
-    //    const newUser = await this.db.user.create(...);
+    const newUser = await this.userRepo.create({ email, encryptedPassword: hashedPassword });
+    const savedUser = await this.userRepo.save(newUser);
 
-    // 4. Return a success state or automatically log them in
-    return { 
+    return {
       message: 'User registered successfully',
-      userId: 'mock-id-123' // Temporary placeholder
+      userId: savedUser.id
     };
   }
 
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
-    // 1. Find the user in your database by email
-    //    If not found -> throw new UnauthorizedException('Invalid credentials');
+    const user = await this.userRepo.findOne({ where: { email } });
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
-    // 2. Verify the password matches the hashed password in your database
-    //    const isMatch = await bcrypt.compare(password, user.password);
-    //    If not a match -> throw new UnauthorizedException('Invalid credentials');
+    const isPasswordMatching = await bcrypt.compare(password, user.encryptedPassword);
+    if (!isPasswordMatching) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
-    // 3. Generate a JWT token for the session
-    //    const payload = { sub: user.id, email: user.email };
-    //    const token = this.jwtService.sign(payload);
+    const payload = { sub: user.id, email: user.email };
 
-    // 4. Return the access token to your app
     return {
-      access_token: 'mock-jwt-token-xyz', // Temporary placeholder
-      user: { email }
+      access_token: await this.jwtService.signAsync(payload),
     };
   }
 }
