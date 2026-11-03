@@ -6,7 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Profiles } from "./Profiles";
+import { Profiles } from "./profile.entity";
 
 @Index("idx_blocks_blocked_id", ["blockedId"], {})
 @Index("unique_block_pair", ["blockedId", "blockerId"], { unique: true })

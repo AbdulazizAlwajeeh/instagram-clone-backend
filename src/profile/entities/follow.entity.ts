@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Profiles } from "./Profiles";
+import { Profiles } from "./profile.entity";
 
 @Index("follows_pkey", ["followerId", "followingId"], { unique: true })
 @Entity("follows", { schema: "public" })
