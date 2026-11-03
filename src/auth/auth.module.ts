@@ -6,6 +6,7 @@ import { Users } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigType } from '@nestjs/config';
 import jwtConfig from '../config/jwt.config';
+import { ProfileModule } from '../profile/profile.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Users]),
@@ -20,7 +21,9 @@ import jwtConfig from '../config/jwt.config';
         },
       };
     },
-  }),],
+  }),
+    ProfileModule
+  ],
   controllers: [AuthController],
   providers: [AuthService],
   exports: [TypeOrmModule]

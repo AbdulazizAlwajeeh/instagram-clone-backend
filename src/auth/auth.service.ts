@@ -6,25 +6,32 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { ProfileService } from '../profile/profile.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(Users)
     private readonly userRepo: Repository<Users>,
+    private readonly profileService: ProfileService,
     private readonly jwtService: JwtService,
   ) { }
 
   async signup(signupDto: SignupDto) {
     const { email, password, username } = signupDto;
 
-    const userExists = await this.userRepo.findOne({ where: { email } });
-    if (userExists) { throw new ConflictException(); }
+    const emailRegistered = await this.userRepo.findOne({ where: { email } });
+    if (emailRegistered) { throw new ConflictException(); }
+
+    const usernameTaken = await this.profileService.isUsernameTaken(username);
+    if (usernameTaken) { throw new ConflictException(); }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await this.userRepo.create({ email, encryptedPassword: hashedPassword });
     const savedUser = await this.userRepo.save(newUser);
+
+    await this.profileService.create(savedUser.id, username);
 
     return {
       message: 'User registered successfully',

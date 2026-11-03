@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import databaseConfig from './config/database.config';
 import { AuthModule } from './auth/auth.module';
+import { ProfileModule } from './profile/profile.module';
 import jwtConfig from './config/jwt.config';
 
 const ENV = process.env.NODE_ENV;
@@ -30,7 +31,9 @@ const ENV = process.env.NODE_ENV;
         autoLoadEntities: true,
       }),
     }),
-    AuthModule],
+    AuthModule,
+    ProfileModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
