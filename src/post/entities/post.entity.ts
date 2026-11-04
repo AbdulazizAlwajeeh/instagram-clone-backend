@@ -6,10 +6,10 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Comments } from "./Comments";
-import { Likes } from "./Likes";
-import { PostReports } from "./PostReports";
-import { Profiles } from "./Profiles";
+import { Comments } from "./comment.entity";
+import { Likes } from "./like.entity";
+import { PostReports } from "./post-report.entity";
+import { Profiles } from "../../profile/entities/profile.entity";
 
 @Index("posts_pkey", ["id"], { unique: true })
 @Entity("posts", { schema: "public" })

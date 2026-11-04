@@ -6,6 +6,7 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import databaseConfig from './config/database.config';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
+import { PostModule } from './post/post.module';
 import jwtConfig from './config/jwt.config';
 
 const ENV = process.env.NODE_ENV;
@@ -33,6 +34,7 @@ const ENV = process.env.NODE_ENV;
     }),
     AuthModule,
     ProfileModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],

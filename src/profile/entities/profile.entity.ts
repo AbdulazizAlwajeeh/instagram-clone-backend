@@ -1,12 +1,12 @@
 import { Column, Entity, Index, OneToMany } from "typeorm";
 import { Blocks } from "./block.entity";
 import { Chats } from "../../entities/Chats";
-import { Comments } from "../../entities/Comments";
+import { Comments } from "../../post/entities/comment.entity";
 import { Follows } from "./follow.entity";
-import { Likes } from "../../entities/Likes";
+import { Likes } from "../../post/entities/like.entity";
 import { Messages } from "../../entities/Messages";
-import { PostReports } from "../../entities/PostReports";
-import { Posts } from "../../entities/Posts";
+import { PostReports } from "../../post/entities/post-report.entity";
+import { Posts } from "../../post/entities/post.entity";
 
 @Index("profiles_pkey", ["id"], { unique: true })
 @Index("profiles_username_key", ["username"], { unique: true })

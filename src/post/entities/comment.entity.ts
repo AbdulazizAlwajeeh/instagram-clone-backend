@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Posts } from "./Posts";
-import { Profiles } from "./Profiles";
+import { Posts } from "./post.entity";
+import { Profiles } from "../../profile/entities/profile.entity";
 
 @Index("comments_pkey", ["id"], { unique: true })
 @Entity("comments", { schema: "public" })

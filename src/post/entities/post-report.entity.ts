@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Posts } from "./Posts";
-import { Profiles } from "./Profiles";
+import { Posts } from "./post.entity";
+import { Profiles } from "../../profile/entities/profile.entity";
 
 @Index("reports_pkey", ["id"], { unique: true })
 @Index("idx_post_reports_post_id", ["postId"], {})
