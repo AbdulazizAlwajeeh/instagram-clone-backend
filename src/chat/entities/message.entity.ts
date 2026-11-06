@@ -1,6 +1,6 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne } from "typeorm";
-import { Chats } from "./Chats";
-import { Profiles } from "./Profiles";
+import { Chats } from "./chat.entity";
+import { Profiles } from "../../profile/entities/profile.entity";
 
 @Index("messages_pkey", ["id"], { unique: true })
 @Entity("messages", { schema: "public" })

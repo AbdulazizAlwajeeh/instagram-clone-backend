@@ -1,10 +1,10 @@
 import { Column, Entity, Index, OneToMany } from "typeorm";
 import { Blocks } from "./block.entity";
-import { Chats } from "../../entities/Chats";
+import { Chats } from "../../chat/entities/chat.entity";
 import { Comments } from "../../post/entities/comment.entity";
 import { Follows } from "./follow.entity";
 import { Likes } from "../../post/entities/like.entity";
-import { Messages } from "../../entities/Messages";
+import { Messages } from "../../chat/entities/message.entity";
 import { PostReports } from "../../post/entities/post-report.entity";
 import { Posts } from "../../post/entities/post.entity";
 
@@ -45,10 +45,10 @@ export class Profiles {
   @OneToMany(() => Chats, (chats) => chats.lastSender)
   chats: Chats[];
 
-  @OneToMany(() => Chats, (chats) => chats.userOne2)
+  @OneToMany(() => Chats, (chats) => chats.profileOne)
   chats2: Chats[];
 
-  @OneToMany(() => Chats, (chats) => chats.userTwo2)
+  @OneToMany(() => Chats, (chats) => chats.profileTwo)
   chats3: Chats[];
 
   @OneToMany(() => Comments, (comments) => comments.user)

@@ -6,8 +6,8 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { Profiles } from "./Profiles";
-import { Messages } from "./Messages";
+import { Profiles } from "../../profile/entities/profile.entity";
+import { Messages } from "./message.entity";
 
 @Index("chats_pkey", ["id"], { unique: true })
 @Index("unique_user_pair", ["userOne", "userTwo"], { unique: true })
@@ -43,13 +43,13 @@ export class Chats {
     onDelete: "CASCADE",
   })
   @JoinColumn([{ name: "user_one", referencedColumnName: "id" }])
-  userOne2: Profiles;
+  profileOne: Profiles;
 
   @ManyToOne(() => Profiles, (profiles) => profiles.chats3, {
     onDelete: "CASCADE",
   })
   @JoinColumn([{ name: "user_two", referencedColumnName: "id" }])
-  userTwo2: Profiles;
+  profileTwo: Profiles;
 
   @OneToMany(() => Messages, (messages) => messages.conversation)
   messages: Messages[];
