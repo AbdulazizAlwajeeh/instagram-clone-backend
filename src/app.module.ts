@@ -9,6 +9,8 @@ import { ProfileModule } from './profile/profile.module';
 import { PostModule } from './post/post.module';
 import { ChatModule } from './chat/chat.module';
 import jwtConfig from './config/jwt.config';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './common/guards/jwt-authorize.guard';
 
 const ENV = process.env.NODE_ENV;
 
@@ -39,6 +41,12 @@ const ENV = process.env.NODE_ENV;
     ChatModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule { }
