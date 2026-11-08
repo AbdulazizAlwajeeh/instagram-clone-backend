@@ -1,31 +1,30 @@
-import { Body, Controller, Get, Headers, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { GetUser } from '../common/decorators/user.decorator';
 
 @Controller('chats')
 export class ChatController {
     constructor(private readonly chatService: ChatService) { }
-    
-    // This is temporary until we implement guards, then user/sender ID will be extracted from the JWT
 
     @Get('messages')
     getMessages(
-        @Headers('x-user-id') userId: string,
+        @GetUser() user: any,
         @Query('chatId') chatId?: string,
         @Query('targetUserId') targetUserId?: string) {
-        return this.chatService.findAllMessages(userId, chatId, targetUserId);
+        return this.chatService.findAllMessages(user.sub, chatId, targetUserId);
     }
 
-    @Get(':userId')
-    getChats(@Param('userId') userId: string) {
-        return this.chatService.findAllChats(userId);
+    @Get()
+    getChats(@GetUser() user: any) {
+        return this.chatService.findAllChats(user.sub);
     }
 
     @Post(':id')
     createMessage(
         @Param('id') chatId: string,
         @Body() createMessageDto: CreateMessageDto,
-        @Headers('x-sender-id') senderId: string) {
-        return this.chatService.sendMessage(chatId, createMessageDto.content, senderId);
+        @GetUser() user: any) {
+        return this.chatService.sendMessage(chatId, createMessageDto.content, user.sub);
     }
 }
