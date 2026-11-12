@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profiles } from './entities/profile.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 @Injectable()
 export class ProfileService {
@@ -30,6 +30,19 @@ export class ProfileService {
     }
 
     async update(id: string, updateProfileDto: UpdateProfileDto) {
+
+        if (updateProfileDto.username) {
+            const usernameExists = await this.profileRepo.exists({
+                where: {
+                    username: updateProfileDto.username,
+                    id: Not(id),
+                },
+            });
+
+            if (usernameExists) {
+                throw new ConflictException('Username is already taken');
+            }
+        }
 
         const profile = await this.profileRepo.preload({ id, ...updateProfileDto });
         if (!profile) { throw new NotFoundException() };
