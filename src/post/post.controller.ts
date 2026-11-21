@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from '../common/decorators/user.decorator';
@@ -22,8 +22,10 @@ export class PostController {
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseUUIDPipe) id: string) {
-        return this.postService.findOne(id);
+    findOne(
+        @Param('id', ParseUUIDPipe) postId: string,
+        @GetUser() user: any) {
+        return this.postService.findOne(postId, user.sub);
     }
 
     @Post(':id/like')

@@ -56,4 +56,8 @@ export class Posts {
   })
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: Profiles;
+
+  isLiked: boolean = false;
+
+  reportedByMe: boolean = false;
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { GetUser } from '../common/decorators/user.decorator';
@@ -8,8 +8,17 @@ export class ProfileController {
     constructor(private readonly profileService: ProfileService) { }
 
     @Get(':id')
-    findOne(@Param('id', ParseUUIDPipe) id: string) {
-        return this.profileService.findOne(id);
+    findOne(
+        @Param('id', ParseUUIDPipe) targetId: string,
+        @GetUser() user: any) {
+        return this.profileService.findOne(user.sub, targetId);
+    }
+
+    @Post(':id/follow')
+    toggleFollow(
+        @Param('id', ParseUUIDPipe) targetId: string,
+        @GetUser() user: any) {
+        return this.profileService.toggleFollow(user.sub, targetId);
     }
 
     @Patch()

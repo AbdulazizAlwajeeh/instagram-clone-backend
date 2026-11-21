@@ -74,4 +74,6 @@ export class Profiles {
 
   @OneToMany(() => Posts, (posts) => posts.user)
   posts: Posts[];
+
+  isFollowed:  boolean = false;
 }

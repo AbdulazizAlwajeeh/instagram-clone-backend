@@ -30,24 +30,29 @@ export class PostService {
 
         return await this.postRepo.save(newPost);
     }
-    async findOne(id: string): Promise<Posts> {
+
+    async findOne(postId: string, userId: string): Promise<Posts> {
         const post = await this.postRepo.findOne({
-            where: { id },
-            relations: { user: true},
-            select: {user: {id: true, username: true, avatarUrl: true}}
+            where: { id:postId },
+            relations: { user: true },
+            select: { user: { id: true, username: true, avatarUrl: true } }
         });
 
         if (!post) {
-            throw new NotFoundException(`Post with ID "${id}" not found`);
+            throw new NotFoundException(`Post with ID "${postId}" not found`);
         }
+
+        post.isLiked = await this.isPostLiked(postId, userId);
+
+        post.reportedByMe = await this.isPostReported(postId, userId);
+
         return post;
     }
-
 
     async findAll(): Promise<Posts[]> {
         return await this.postRepo.find({
             relations: { user: true },
-            select: {user: {id: true, username: true, avatarUrl: true}},
+            select: { user: { id: true, username: true, avatarUrl: true } },
             order: {
                 createdAt: 'DESC',
             },
@@ -62,6 +67,18 @@ export class PostService {
         if (!postExists) {
             throw new NotFoundException(`Post with ID "${postId}" not found`);
         }
+    }
+
+    private async isPostLiked(postId: string, userId: string): Promise<boolean> {
+        return this.likeRepo.exists({
+            where: { postId, userId },
+        });
+    }
+
+    private async isPostReported(postId: string, reporterId: string): Promise<boolean> {
+        return this.reportRepo.exists({
+            where: { postId, reporterId },
+        });
     }
 
     async toggleLike(userId: string, postId: string) {
@@ -98,7 +115,7 @@ export class PostService {
         return this.commentRepo.find({
             where: { post: { id: postId } },
             relations: { user: true },
-            select: {user: {id: true, username: true, avatarUrl: true}},
+            select: { user: { id: true, username: true, avatarUrl: true } },
             order: { createdAt: 'ASC' },
         });
     }
