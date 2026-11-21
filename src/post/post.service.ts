@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Posts } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -33,7 +33,7 @@ export class PostService {
 
     async findOne(postId: string, userId: string): Promise<Posts> {
         const post = await this.postRepo.findOne({
-            where: { id:postId },
+            where: { id: postId },
             relations: { user: true },
             select: { user: { id: true, username: true, avatarUrl: true } }
         });
@@ -57,6 +57,61 @@ export class PostService {
                 createdAt: 'DESC',
             },
         });
+    }
+
+    async findByProfileId(profileId: string): Promise<Posts[]> {
+        const posts = await this.postRepo.find({
+            relations: { user: true },
+            where: {
+                user: {
+                    id: profileId,
+                },
+            },
+            select: { user: { id: true, username: true, avatarUrl: true } },
+            order: {
+                createdAt: 'DESC',
+            },
+        })
+
+        return posts;
+    }
+
+    async getHomeFeed(userId: string): Promise<Posts[]> {
+
+        // Getting only the posts of the followed profiles
+        const posts = await this.postRepo.find({
+            relations: { user: true },
+            where: {
+                user: {
+                    follows2: {
+                        followerId: userId,
+                    },
+                },
+            },
+            select: { user: { id: true, username: true, avatarUrl: true } },
+            order: {
+                createdAt: 'DESC',
+            },
+        })
+
+        if (posts.length === 0) return [];
+
+        // Deciding whether the post is liked by the user
+        const postIds = posts.map((post) => post.id);
+        const userLikes = await this.likeRepo.find({
+            select: { postId: true },
+            where: {
+                userId,
+                postId: In(postIds),
+            },
+        });
+        const likedPostIds = new Set(userLikes.map((like) => like.postId));
+
+        posts.forEach((post) => {
+            post.isLiked = likedPostIds.has(post.id);
+        })
+
+        return posts;
     }
 
     private async ensurePostExists(postId: string): Promise<void> {

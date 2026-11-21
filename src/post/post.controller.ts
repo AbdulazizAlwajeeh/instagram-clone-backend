@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { GetUser } from '../common/decorators/user.decorator';
@@ -17,9 +17,21 @@ export class PostController {
     }
 
     @Get()
-    findAll() {
+    findAll(
+        @Query('profileId', new ParseUUIDPipe({ optional: true })) profileId?: string,
+    ) {
+        if (profileId) {
+            return this.postService.findByProfileId(profileId);
+        }
         return this.postService.findAll();
     }
+    
+        @Get('feed')
+        getHomeFeed(
+            @GetUser() user: any,
+        ) {
+            return this.postService.getHomeFeed(user.sub);
+        }
 
     @Get(':id')
     findOne(
