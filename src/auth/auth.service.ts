@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable} from '@nestjs/common';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { Users } from './entities/user.entity';
@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ProfileService } from '../profile/profile.service';
+import { AuthErrorCode, AuthException } from './exceptions/auth.exception';
 
 @Injectable()
 export class AuthService {
@@ -21,10 +22,10 @@ export class AuthService {
     const { email, password, username } = signupDto;
 
     const emailRegistered = await this.userRepo.findOne({ where: { email } });
-    if (emailRegistered) { throw new ConflictException(); }
+    if (emailRegistered) { throw new AuthException(AuthErrorCode.email_exists); }
 
     const usernameTaken = await this.profileService.isUsernameTaken(username);
-    if (usernameTaken) { throw new ConflictException(); }
+    if (usernameTaken) { throw new AuthException(AuthErrorCode.username_exists); }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -44,12 +45,12 @@ export class AuthService {
 
     const user = await this.userRepo.findOne({ where: { email } });
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new AuthException(AuthErrorCode.invalid_credentials);
     }
 
     const isPasswordMatching = await bcrypt.compare(password, user.encryptedPassword);
     if (!isPasswordMatching) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new AuthException(AuthErrorCode.invalid_credentials);
     }
 
     const payload = { sub: user.id, email: user.email };
