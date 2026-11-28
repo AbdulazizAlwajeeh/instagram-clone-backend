@@ -2,12 +2,14 @@ import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post } from '@nestj
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { GetUser } from '../common/decorators/user.decorator';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('profiles')
 export class ProfileController {
     constructor(private readonly profileService: ProfileService) { }
 
     @Get(':id')
+    @ApiOperation({summary: 'Fetches a profile by ID'})
     findOne(
         @Param('id', ParseUUIDPipe) targetId: string,
         @GetUser() user: any) {
@@ -15,6 +17,7 @@ export class ProfileController {
     }
 
     @Post(':id/follow')
+    @ApiOperation({summary: 'Follows/unfollows a profile'})
     toggleFollow(
         @Param('id', ParseUUIDPipe) targetId: string,
         @GetUser() user: any) {
@@ -22,6 +25,7 @@ export class ProfileController {
     }
 
     @Patch()
+    @ApiOperation({summary: 'Updates a profile'})
     update(
         @GetUser() user: any,
         @Body() updateProfileDto: UpdateProfileDto,
